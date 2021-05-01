@@ -11,6 +11,23 @@ struct PamException <: Exception
 end
 
 
+"""
+    authenticate(username::AbstractString, password::AbstractString)
+
+Attempts to authenticate a user with the local system via PAM under the given username and password.
+
+# Examples
+```julia
+using PAM
+
+print("Username: ")
+username = readline()
+password = read(Base.getpass("Password"), String)
+
+valid = authenticate(username, password)
+# Valid is true if authentication was successful
+```
+"""
 function authenticate(username::AbstractString, password::AbstractString)
     libpamjl = Libdl.dlopen("build/libpamjl.so")
     pamjl_authenticate = Libdl.dlsym(libpamjl, :pamjl_authenticate)
