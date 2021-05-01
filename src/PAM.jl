@@ -29,7 +29,7 @@ valid = authenticate(username, password)
 ```
 """
 function authenticate(username::AbstractString, password::AbstractString)
-    libpamjl = Libdl.dlopen("build/libpamjl.so")
+    libpamjl = Libdl.dlopen(normpath("$(@__DIR__)/../build/libpamjl.so"))
     pamjl_authenticate = Libdl.dlsym(libpamjl, :pamjl_authenticate)
     ccall(pamjl_authenticate, Cint, (Ptr{Cchar}, Ptr{Cchar}), username, password) == 0
 end
