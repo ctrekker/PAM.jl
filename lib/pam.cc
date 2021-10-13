@@ -27,6 +27,9 @@ static struct pam_conv conv = {
 };
 
 extern "C" int pamjl_authenticate(char *user, char *pass) {
+    char* service = (char*)"login";
+    int resetcred = PAM_REINITIALIZE_CRED;
+
     pam_handle_t *pamh=NULL;
     int retval;
 
@@ -35,27 +38,39 @@ extern "C" int pamjl_authenticate(char *user, char *pass) {
     };
     conv.appdata_ptr = (void*)(&appdata);
 
-    retval = pam_start("check_user", user, &conv, &pamh);
+    retval = pam_start(service, user, &conv, &pamh);
 
-    if (retval == PAM_SUCCESS)
+    if (retval == PAM_SUCCESS) {
         retval = pam_authenticate(pamh, 0);    /* is user really user? */
+        if(retval != PAM_SUCCESS) {
+            fprintf(stderr, "%s: pam_authenticate failed: %s\n", service, pam_strerror(pamh, retval));
+        }
+    }
+    else {
+        fprintf(stderr, "%s: pam_start failed: %s\n", service, pam_strerror(pamh, retval));
+		return 1;
+    }
 
-    if (retval == PAM_SUCCESS)
+    if(retval == PAM_SUCCESS) {
         retval = pam_acct_mgmt(pamh, 0);       /* permitted access? */
-
+        if(retval != PAM_SUCCESS) {
+            fprintf(stderr, "%s: pam_acct_mgmt failed: %s\n", service, pam_strerror(pamh, retval));
+        }
+    }
+    
     /* This is where we have been authorized or not. */
 
     if (retval == PAM_SUCCESS) {
-        // fprintf(stdout, "Authenticated\n");
-    } else {
-        // fprintf(stdout, "Not Authenticated\n");
+        // reset credentials (https://github.com/minrk/pamela/blob/master/pamela.py#L380)
+        retval = pam_setcred(pamh, resetcred);
+        if(retval != PAM_SUCCESS) {
+            fprintf(stderr, "%s: pam_setcred failed: %s\n", service, pam_strerror(pamh, retval));
+        }
     }
 
-    if (pam_end(pamh,retval) != PAM_SUCCESS) {     /* close Linux-PAM */
-        pamh = NULL;
-        fprintf(stderr, "check_user: failed to release authenticator\n");
-        exit(1);
+    if (pam_end(pamh, retval) != PAM_SUCCESS) {     /* close Linux-PAM */
+        fprintf(stderr, "%s: pam_end failed: %s\n", service, pam_strerror(pamh, retval));
     }
 
-    return ( retval == PAM_SUCCESS ? 0:1 );       /* indicate success */
+    return (retval == PAM_SUCCESS ? 0 : 1);       /* indicate success */
 }
