@@ -1,4 +1,4 @@
-# PAM.jl
+# PAMAuth.jl
 A minimal interface to PAM authentication. Meant to mimic the behavior of Python's Pamela.
 
 ## Installation

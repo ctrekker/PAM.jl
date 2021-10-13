@@ -1,4 +1,4 @@
-module PAM
+module PAMAuth
 
 export authenticate
 

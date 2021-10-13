@@ -1,6 +1,6 @@
-name = "PAM"
+name = "PAMAuth"
 uuid = "65a6d51f-e0d2-4d04-b1c7-956c784c774e"
-authors = ["Connor Burns <ctrekker4@gmail.com>"]
+authors = ["Connor Burns <cburns@cot.llc>"]
 version = "0.1.0"
 
 [deps]
