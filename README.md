@@ -6,5 +6,5 @@ First make sure you're on a system with PAM installed. Next, ensure your system 
 
 Next install this package in the Julia REPL
 ```julia-repl
-julia> add https://github.com/ctrekker/PAM.jl#master
+julia> add https://github.com/ctrekker/PAMAuth.jl#master
 ```
